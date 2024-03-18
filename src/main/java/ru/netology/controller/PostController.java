@@ -1,8 +1,10 @@
 package ru.netology.controller;
 
 import com.google.gson.Gson;
+import ru.netology.exception.NotFoundException;
 import ru.netology.model.Post;
 import ru.netology.service.PostService;
+
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -24,18 +26,48 @@ public class PostController {
     }
 
     public void getById(long id, HttpServletResponse response) {
-        // TODO: deserialize request & serialize response
+        try {
+            response.setContentType(APPLICATION_JSON);
+            final var data = service.getById(id);
+            final var gson = new Gson();
+            response.getWriter().print(gson.toJson(data));
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        } catch (IOException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
     }
 
-    public void save(Reader body, HttpServletResponse response) throws IOException {
-        response.setContentType(APPLICATION_JSON);
-        final var gson = new Gson();
-        final var post = gson.fromJson(body, Post.class);
-        final var data = service.save(post);
-        response.getWriter().print(gson.toJson(data));
+    public void save(Reader body, HttpServletResponse response) {
+        Post post = null;
+        try {
+            response.setContentType(APPLICATION_JSON);
+            final var gson = new Gson();
+            post = gson.fromJson(body, Post.class);
+            final var data = service.save(post);
+            response.getWriter().print(gson.toJson(data));
+        } catch (IOException e) {
+            e.printStackTrace();
+            if (post.getId() == 0) {
+                if (e.getCause() != null) {
+                    e.getCause().printStackTrace();
+                }
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            } else {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            }
+        }
     }
 
     public void removeById(long id, HttpServletResponse response) {
-        // TODO: deserialize request & serialize response
+        try {
+            service.removeById(id);
+            response.setStatus(HttpServletResponse.SC_OK);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
     }
 }

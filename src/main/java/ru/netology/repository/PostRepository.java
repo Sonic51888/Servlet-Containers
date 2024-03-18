@@ -5,9 +5,10 @@ import ru.netology.model.Post;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 public class PostRepository {
-    private final ConcurrentHashMap<Long, Post> postCollection;
+    private volatile ConcurrentHashMap<Long, Post> postCollection = new ConcurrentHashMap<Long, Post>();
     AtomicLong countPosts = new AtomicLong(0L);
 
     public PostRepository() {
@@ -15,7 +16,7 @@ public class PostRepository {
     }
 
     public List<Post> all() {
-        return new ArrayList<>(postCollection.values());
+        return postCollection.values().parallelStream().collect(Collectors.toList());
     }
 
     public Optional<Post> getById(long id) {

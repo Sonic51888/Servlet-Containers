@@ -13,6 +13,10 @@ public class MainServlet extends HttpServlet {
     private static final String GET = "GET";
     private static final String POST = "POST";
     private static final String DELETE = "DELETE";
+    private static final String API_PATH = "/api/posts";
+    private static final String DIGITAL_PATTERN = "/\\d";
+    private static final String SLASH = "/";
+
 
     @Override
     public void init() {
@@ -28,23 +32,23 @@ public class MainServlet extends HttpServlet {
             String path = req.getRequestURI();
             String method = req.getMethod();
             // primitive routing
-            if (method.equals(GET) && path.equals("/api/posts")) {
+            if (method.equals(GET) && path.equals(API_PATH)) {
                 controller.all(resp);
                 return;
             }
-            if (method.equals(GET) && path.matches("/api/posts/\\d+")) {
+            if (method.equals(GET) && path.matches(API_PATH+DIGITAL_PATTERN)){
                 // easy way
-                final var id = Long.parseLong(path.substring(path.lastIndexOf("/")));
+                final var id = Long.parseLong(path.substring(path.lastIndexOf(SLASH)));
                 controller.getById(id, resp);
                 return;
             }
-            if (method.equals(POST) && path.equals("/api/posts")) {
+            if (method.equals(POST) && path.equals(API_PATH)) {
                 controller.save(req.getReader(), resp);
                 return;
             }
-            if (method.equals(DELETE) && path.matches("/api/posts/\\d+")) {
+            if (method.equals(DELETE) && path.matches(API_PATH+DIGITAL_PATTERN)) {
                 // easy way
-                final var id = Long.parseLong(path.substring(path.lastIndexOf("/")));
+                final var id = Long.parseLong(path.substring(path.lastIndexOf(SLASH)));
                 controller.removeById(id, resp);
                 return;
             }
