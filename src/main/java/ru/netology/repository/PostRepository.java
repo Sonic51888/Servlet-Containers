@@ -1,12 +1,13 @@
 package ru.netology.repository;
 
+import org.springframework.stereotype.Repository;
 import ru.netology.model.Post;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
-
+@Repository
 public class PostRepository {
     private volatile ConcurrentHashMap<Long, Post> postCollection = new ConcurrentHashMap<Long, Post>();
     AtomicLong countPosts = new AtomicLong(0L);
